@@ -6,9 +6,13 @@ namespace lottery_logic
 {
     class ticket
     {
-        static readonly int maxballvalue = 69;
-        static readonly int minballvalue = 1;
-        public void QuickPick()
+       private static readonly int maxballvalue = 69;
+       private static readonly int minballvalue = 1;
+       private static readonly int maxpowerballvalue = 26;
+       private static readonly int minpowerballvalue = 1;
+       private  List<int> balls = new List<int>();
+
+       public void QuickPick()
         {
             if (balls.Count == 0)
             {
@@ -17,6 +21,7 @@ namespace lottery_logic
                 {
                     balls.Add(ballpick.Next(minballvalue, maxballvalue));
                 }
+                balls.Add(ballpick.Next(minpowerballvalue, maxpowerballvalue));
             }
             else
             {
@@ -24,10 +29,10 @@ namespace lottery_logic
             }
         }
 
-        public void PickFive(int ball1, int ball2, int ball3, int ball4, int ball5)
+        public void PickFive(int ball1, int ball2, int ball3, int ball4, int ball5, int powerball)
         {
             //Here I looked into using params to get a variable number of paramters
-            //as this would allow me to interate over the balls rather than write 
+            //as this would allow me to iterate over the balls rather than write 
             //code for each one, but then I have to verify each param is an int as 
             //well, and verify that I've only been passed 5 integers.
             if (balls.Count == 0)
@@ -73,6 +78,14 @@ namespace lottery_logic
                 {
                     throw new System.ArgumentException("Ball value outside acceptable range.");
                 }
+                if (powerball >= minpowerballvalue && powerball <= maxpowerballvalue)
+                {
+                    balls.Add(powerball);
+                }
+                else
+                {
+                    throw new System.ArgumentException("Ball value outside acceptable range.");
+                }
 
             }
             else
@@ -82,18 +95,11 @@ namespace lottery_logic
 
         }
 
-        List<int> balls = new List<int>();
+       
 
-        private bool Validateball(int checkball)
+       private bool Validateball(int checkball)
         {
-            if (checkball >= minballvalue && checkball <= maxballvalue)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (checkball >= minballvalue && checkball <= maxballvalue);
         }
 
     }
