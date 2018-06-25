@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace lottery_logic
@@ -10,18 +11,29 @@ namespace lottery_logic
        private static readonly int minballvalue = 1;
        private static readonly int maxpowerballvalue = 26;
        private static readonly int minpowerballvalue = 1;
-       private  List<int> balls = new List<int>();
+       private static int totaltickets = 0;
+       private int ticketnumber;
+       private List<int> whiteballs = new List<int>(Enumerable.Range(minballvalue, maxballvalue));
+       private List<int> ballschosen = new List<int>();
+
+       public ticket()
+        {
+            totaltickets += 1;
+            ticketnumber = totaltickets;
+        }
 
        public void QuickPick()
         {
-            if (balls.Count == 0)
+            if (ballschosen.Count == 0)
             {
                 Random ballpick = new Random();
                 for (int ball = 0; ball < 5; ball++)
                 {
-                    balls.Add(ballpick.Next(minballvalue, maxballvalue));
+                    int randomball = ballpick.Next(whiteballs.Count);
+                    ballschosen.Add(whiteballs[randomball]);
+                    whiteballs.RemoveAt(randomball);
                 }
-                balls.Add(ballpick.Next(minpowerballvalue, maxpowerballvalue));
+                ballschosen.Add(ballpick.Next(minpowerballvalue, maxpowerballvalue));
             }
             else
             {
@@ -29,64 +41,27 @@ namespace lottery_logic
             }
         }
 
-        public void PickFive(int ball1, int ball2, int ball3, int ball4, int ball5, int powerball)
+        public void PickSix(List<int> picklist)
         {
-            //Here I looked into using params to get a variable number of paramters
-            //as this would allow me to iterate over the balls rather than write 
-            //code for each one, but then I have to verify each param is an int as 
-            //well, and verify that I've only been passed 5 integers.
-            if (balls.Count == 0)
+            if (ballschosen.Count == 0)
             {
-
-                if (Validateball(ball1))
+                if (picklist.Count == 6)
                 {
-                    balls.Add(ball1);
-                }
-                else
+                   if (Validateballlist(picklist))
+                   {
+                    ballschosen.AddRange(picklist);
+                    //ballschosen.Add(picklist[ball]);
+                   }
+                   else
+                   {
+                    throw new System.ArgumentException("Invalid Ball Value");
+                   }                                           
+                    
+                
+                }else
                 {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
+                    throw new System.ArgumentException("Invalid number of balls picked");
                 }
-                if (Validateball(ball2))
-                {
-                    balls.Add(ball2);
-                }
-                else
-                {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
-                }
-                if (Validateball(ball3))
-                {
-                    balls.Add(ball3);
-                }
-                else
-                {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
-                }
-                if (Validateball(ball4))
-                {
-                    balls.Add(ball4);
-                }
-                else
-                {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
-                }
-                if (Validateball(ball5))
-                {
-                    balls.Add(ball5);
-                }
-                else
-                {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
-                }
-                if (powerball >= minpowerballvalue && powerball <= maxpowerballvalue)
-                {
-                    balls.Add(powerball);
-                }
-                else
-                {
-                    throw new System.ArgumentException("Ball value outside acceptable range.");
-                }
-
             }
             else
             {
@@ -95,11 +70,30 @@ namespace lottery_logic
 
         }
 
-       
-
-       private bool Validateball(int checkball)
+       public int ReadTicketNumber()
         {
-            return (checkball >= minballvalue && checkball <= maxballvalue);
+            return ticketnumber;
+        }
+       public List<int> ReadTicket()
+        {
+            return ballschosen;
+        }
+
+       private bool Validateballlist(List<int> checklist)
+        {
+            List<int> validlist = new List<int>();
+            for (int ball = 0; ball < 5; ball++)
+            {
+                if (checklist[ball] >= minballvalue && checklist[ball] <= maxballvalue && !validlist.Contains(checklist[ball])){
+                    validlist.Add(checklist[ball]);
+                }else
+                {
+                    return false;
+                }
+            }
+
+            return (checklist[5] >= minpowerballvalue && checklist[5] <= maxpowerballvalue);
+              
         }
 
     }
