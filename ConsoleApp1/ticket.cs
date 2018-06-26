@@ -7,25 +7,29 @@ namespace lottery_logic
 {
     class ticket
     {
-       private static readonly int maxballvalue = 69;
-       private static readonly int minballvalue = 1;
-       private static readonly int maxpowerballvalue = 26;
-       private static readonly int minpowerballvalue = 1;
-       private static int totaltickets = 0;
-       private int ticketnumber;
-       private List<int> whiteballs = new List<int>(Enumerable.Range(minballvalue, maxballvalue));
-       private List<int> ballschosen = new List<int>();
+        private static readonly int maxballvalue = 69;
+        private static readonly int minballvalue = 1;
+        private static readonly int maxpowerballvalue = 26;
+        private static readonly int minpowerballvalue = 1;
+        private static int totaltickets = 0;
+        private bool powerplay;
+        private long ticketdate;
+        private int ticketnumber;
+        private List<int> whiteballs = new List<int>(Enumerable.Range(minballvalue, maxballvalue));
+        private List<int> ballschosen = new List<int>();
 
-       public ticket()
+        public ticket()
         {
             totaltickets += 1;
             ticketnumber = totaltickets;
         }
 
-       public void QuickPick()
+
+        public void QuickPick(bool powerplayselection)
         {
             if (ballschosen.Count == 0)
             {
+                ticketdate = DateTime.Now.Ticks;
                 Random ballpick = new Random();
                 for (int ball = 0; ball < 5; ball++)
                 {
@@ -34,6 +38,7 @@ namespace lottery_logic
                     whiteballs.RemoveAt(randomball);
                 }
                 ballschosen.Add(ballpick.Next(minpowerballvalue, maxpowerballvalue));
+                powerplay = powerplayselection;
             }
             else
             {
@@ -41,17 +46,18 @@ namespace lottery_logic
             }
         }
 
-        public void PickSix(List<int> picklist)
+        public void PickSix(List<int> picklist, bool powerplayselection)
         {
             if (ballschosen.Count == 0)
             {
                 if (picklist.Count == 6)
                 {
-                   if (Validateballlist(picklist))
+                   if (ValidateBallList(picklist))
                    {
-                    ballschosen.AddRange(picklist);
-                    //ballschosen.Add(picklist[ball]);
-                   }
+                        ballschosen.AddRange(picklist);
+                        ticketdate = DateTime.Now.Ticks;
+                        powerplay = powerplayselection;
+                    }
                    else
                    {
                     throw new System.ArgumentException("Invalid Ball Value");
@@ -70,16 +76,27 @@ namespace lottery_logic
 
         }
 
-       public int ReadTicketNumber()
+        public bool PowerPlay()
+        {
+            return powerplay;
+        }
+
+        public int TicketNumber()
         {
             return ticketnumber;
         }
-       public List<int> ReadTicket()
+
+        public long TicketDate()
+        {
+            return ticketdate;
+        }
+
+        public List<int> ReadNumbers()
         {
             return ballschosen;
         }
 
-       private bool Validateballlist(List<int> checklist)
+        private bool ValidateBallList(List<int> checklist)
         {
             List<int> validlist = new List<int>();
             for (int ball = 0; ball < 5; ball++)
